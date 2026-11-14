@@ -51,6 +51,7 @@ try {
                             ".gif"  { "image/gif" }
                             ".svg"  { "image/svg+xml" }
                             ".json" { "application/json" }
+                            ".pdf"  { "application/pdf" }
                             default { "application/octet-stream" }
                         }
                         
