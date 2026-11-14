@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kishore Kuppusamy — Multidisciplinary Designer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090303;
+      --card-bg: rgba(18, 10, 10, 0.82);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover: rgba(255, 255, 255, 0.16);
+      --text-main: #f5f2f2;
+      --text-muted: #aca1a1;
+      --accent: #ff4d4d;
+      --accent-glow: rgba(255, 77, 77, 0.35);
+      --tag-bg: rgba(255, 255, 255, 0.06);
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Space Grotesk', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Fixed Canvas Animation Layer - Crisp and Central Focus */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      opacity: 1; /* Main focus: full crisp opacity */
+    }
+
+    /* Ambient Vignette - Keeps edges elegant while center subject is completely clear */
+    .ambient-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 48%, rgba(9, 3, 3, 0) 35%, rgba(9, 3, 3, 0.65) 75%, rgba(9, 3, 3, 0.95) 100%);
+    }
+
+    /* Page Content Structure */
+    .content-wrapper {
+      position: relative;
+      z-index: 3;
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
+
+    section {
+      padding: 7rem 0;
+      position: relative;
+    }
+
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin-bottom: 2rem;
+      line-height: 1.15;
+    }
+
+    /* Glass Card Style */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 2.5rem;
+      transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+      border-color: var(--card-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ---------------------------------------------------- */
+    /* 1. HERO SECTION: IMAGE IN FRONT, TEXT FLANKING/AROUND */
+    /* ---------------------------------------------------- */
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      padding: 4rem 0;
+    }
+
+    /* Large Background Typography Behind Subject */
+    .hero-bg-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 15vw, 14rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.05);
+      z-index: 0;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Dual-Flank Hero Layout Grid */
+    .hero-grid {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1.1fr;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    /* Left Flank: Identity & Heading */
+    .hero-left-flank {
+      max-width: 440px;
+      background: linear-gradient(135deg, rgba(20, 10, 10, 0.75) 0%, rgba(12, 5, 5, 0.4) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 24px;
+      padding: 2.25rem 2rem;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3.2vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(135deg, #ffffff 40%, #ff8b8b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-role {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-headline {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #ede5e5;
+      line-height: 1.45;
+    }
+
+    /* Center Spacer: Ensures Subject is 100% Uncovered & Focused */
+    .hero-center-focal-zone {
+      min-height: 480px;
+      pointer-events: none;
+    }
+
+    /* Right Flank: Bio, Location & CTAs */
+    .hero-right-flank {
+      max-width: 440px;
+      justify-self: end;
+      background: linear-gradient(135deg, rgba(20, 10, 10, 0.75) 0%, rgba(12, 5, 5, 0.4) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 24px;
+      padding: 2.25rem 2rem;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-bio {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-location {
+      font-size: 0.92rem;
+      color: #ded1d1;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .location-pulse-dot {
+      width: 9px;
+      height: 9px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent);
+      display: inline-block;
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(0.85); }
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 1.75rem;
+      font-family: var(--font-display);
+      font-size: 0.92rem;
+      font-weight: 600;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #ffffff;
+      color: #0d0505;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-primary:hover {
+      background: #f0e6e6;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.28);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.35);
+      transform: translateY(-2px);
+    }
+
+    /* 2. About Section */
+    .about-card {
+      max-width: 920px;
+    }
+
+    .about-card p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.8;
+    }
+
+    .about-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-card p strong {
+      color: var(--text-main);
+    }
+
+    /* 3. Expertise Section */
+    .expertise-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .expertise-card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .card-image-wrap {
+      width: 100%;
+      height: 240px;
+      overflow: hidden;
+      position: relative;
+      background: #180d0d;
+    }
+
+    .card-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .expertise-card:hover .card-image-wrap img {
+      transform: scale(1.06);
+    }
+
+    .expertise-body {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .expertise-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+    }
+
+    .expertise-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .expertise-tags {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 1rem;
+    }
+
+    /* 4. Portfolio / Selected Works */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2rem;
+    }
+
+    .portfolio-card {
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .portfolio-card .card-image-wrap {
+      height: 260px;
+    }
+
+    .portfolio-card:hover .card-image-wrap img {
+      transform: scale(1.05);
+    }
+
+    .portfolio-body {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .project-num-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+    }
+
+    .project-tagline {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #ded6d6;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-cat {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .project-detail {
+      font-size: 0.85rem;
+      color: #b5a8a8;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    .project-link {
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      transition: gap 0.2s ease, color 0.2s ease;
+    }
+
+    .project-link:hover {
+      color: #ffffff;
+      gap: 0.7rem;
+    }
+
+    /* 5. Tools & Skills */
+    .toolkit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .toolkit-column-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      list-style: none;
+    }
+
+    .pill-item {
+      background: var(--tag-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #e5dede;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .pill-item:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    /* 6. Workflow / Design Process */
+    .process-timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .process-card {
+      padding: 2rem 1.75rem;
+      position: relative;
+    }
+
+    .process-step {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .process-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* 7. Education */
+    .education-card {
+      max-width: 800px;
+    }
+
+    .edu-degree {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .edu-institution {
+      font-size: 1.05rem;
+      color: #ded6d6;
+      margin-bottom: 0.25rem;
+    }
+
+    .edu-meta {
+      font-size: 0.9rem;
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+
+    .edu-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* 8. Contact Section */
+    .contact-card {
+      max-width: 900px;
+    }
+
+    .contact-heading {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+
+    .contact-tagline {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+
+    .contact-subtext {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      max-width: 700px;
+      line-height: 1.7;
+    }
+
+    .contact-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      list-style: none;
+    }
+
+    .contact-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .contact-item-label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .contact-item-value {
+      font-size: 1rem;
+      color: var(--text-main);
+      word-break: break-all;
+    }
+
+    .contact-item-value a {
+      color: var(--text-main);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .contact-item-value a:hover {
+      color: var(--accent);
+    }
+
+    /* 9. Footer */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 3rem 0;
+      text-align: center;
+      position: relative;
+      z-index: 3;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .footer-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .footer-highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Responsive Adaptation */
+    @media (max-width: 1100px) {
+      .hero-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+      .hero-center-focal-zone {
+        display: none;
+      }
+      .hero-right-flank {
+        justify-self: start;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .content-wrapper {
+        padding: 0 1.25rem;
+      }
+      section {
+        padding: 5rem 0;
+      }
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+      }
+      .hero-left-flank, .hero-right-flank {
+        max-width: 100%;
+      }
+      .glass-card {
+        padding: 1.75rem;
+      }
+      .section-title {
+        font-size: 2.1rem;
+      }
+      .hero-bg-text {
+        font-size: 4.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FIXED CANVAS SCROLL ANIMATION (MAIN VISUAL FOCUS) -->
+  <div id="canvas-container">
+    <canvas id="animation-canvas"></canvas>
+  </div>
+
+  <!-- AMBIENT VIGNETTE OVERLAY -->
+  <div class="ambient-overlay"></div>
+
+  <!-- PORTFOLIO CONTENT -->
+  <div class="content-wrapper">
+
+    <!-- 1. HERO SECTION (TEXT FLANKING / FRAMING THE IMAGE, NEVER COVERING IT) -->
+    <section class="hero-section" id="hero">
+      
+      <!-- Subtle Grand Typographic Layer Behind The Subject -->
+      <div class="hero-bg-text" aria-hidden="true">KISHORE</div>
+
+      <div class="hero-grid">
+        
+        <!-- Left Flank: Identity & Headline -->
+        <div class="hero-left-flank">
+          <span class="section-label">INTRODUCTION / 01</span>
+          <h1 class="hero-name">KISHORE KUPPUSAMY</h1>
+          <h2 class="hero-role">Multidisciplinary Designer</h2>
+          <p class="hero-headline">Designing meaningful digital experiences and impactful visuals.</p>
+        </div>
+
+        <!-- Center Focal Area: Kept 100% Free for Kishore's Animated Portrait -->
+        <div class="hero-center-focal-zone"></div>
+
+        <!-- Right Flank: Story, Location & Actions -->
+        <div class="hero-right-flank">
+          <p class="hero-bio">
+            I’m a creative designer passionate about crafting intuitive digital experiences, compelling visual identities, and engaging visual stories. I combine UI/UX design, graphic design, and video editing to transform ideas into thoughtful and meaningful creative work.
+          </p>
+          <div class="hero-location">
+            <span class="location-pulse-dot"></span>
+            <span>Based in Karur, Tamil Nadu, India.</span>
+          </div>
+          <div class="cta-group">
+            <a href="#portfolio" class="btn btn-primary">Explore My Work</a>
+            <a href="#contact" class="btn btn-secondary">Let's Connect</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. ABOUT ME -->
+    <section id="about">
+      <span class="section-label">ABOUT / 02</span>
+      <h2 class="section-title">A little about me.</h2>
+      <div class="glass-card about-card">
+        <p>Hello! I'm <strong>Kishore Kuppusamy</strong>, a multidisciplinary designer with a background in Visual Communication and a passion for digital creativity.</p>
+        <p>I enjoy solving design challenges through user-centered thinking, clean interfaces, and strong visual storytelling. My work spans UI/UX design, graphic design, photo manipulation, and video editing.</p>
+        <p>I believe great design is not just about how things look, but also about how they work and how people experience them.</p>
+        <p>I'm continuously exploring new tools, creative techniques, and design approaches to improve my craft and create meaningful experiences.</p>
+      </div>
+    </section>
+
+    <!-- 3. MY EXPERTISE -->
+    <section id="expertise">
+      <span class="section-label">WHAT I DO / 03</span>
+      <h2 class="section-title">My expertise</h2>
+      <div class="expertise-grid">
+
+        <!-- Card 1 -->
+        <div class="glass-card expertise-card">
+          <div class="card-image-wrap">
+            <img src="images/expertise-uiux.jpg" alt="UI/UX Design" loading="lazy">
+          </div>
+          <div class="expertise-body">
+            <h3 class="expertise-title">UI/UX Design</h3>
+            <p class="expertise-desc">Creating intuitive interfaces, user flows, wireframes, prototypes, and seamless digital experiences.</p>
+            <div class="expertise-tags">Figma · Wireframing · Prototyping · Design Systems</div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="glass-card expertise-card">
+          <div class="card-image-wrap">
+            <img src="images/expertise-graphic.jpg" alt="Graphic Design" loading="lazy">
+          </div>
+          <div class="expertise-body">
+            <h3 class="expertise-title">Graphic Design</h3>
+            <p class="expertise-desc">Crafting visual identities, creative posters, layouts, and impactful digital visuals.</p>
+            <div class="expertise-tags">Photoshop · Illustrator · Typography · Photo Manipulation</div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-card expertise-card">
+          <div class="card-image-wrap">
+            <img src="images/expertise-video.jpg" alt="Video Editing & AI Content" loading="lazy">
+          </div>
+          <div class="expertise-body">
+            <h3 class="expertise-title">Video Editing & AI Content</h3>
+            <p class="expertise-desc">Transforming ideas into engaging visual stories through editing, motion, and AI-assisted creative content.</p>
+            <div class="expertise-tags">Premiere Pro · Video Editing · AI Content Creation</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. SELECTED WORKS -->
+    <section id="portfolio">
+      <span class="section-label">PORTFOLIO / 04</span>
+      <h2 class="section-title">Selected works</h2>
+      <div class="portfolio-grid">
+
+        <!-- Work 01 -->
+        <div class="glass-card portfolio-card">
+          <div class="card-image-wrap">
+            <img src="images/work-phonepe.jpg" alt="01. PhonePe Redesign" loading="lazy">
+          </div>
+          <div class="portfolio-body">
+            <h3 class="project-num-title">01. PhonePe Redesign</h3>
+            <p class="project-tagline">Simplifying Digital Payments</p>
+            <p class="project-cat">UI/UX Design · Mobile App · Figma</p>
+            <a href="https://www.behance.net/gallery/?utm_source=chatgpt.com" target="_blank" rel="noopener noreferrer" class="project-link">
+              View project on Behance &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Work 02 -->
+        <div class="glass-card portfolio-card">
+          <div class="card-image-wrap">
+            <img src="images/work-leafora.jpg" alt="02. Leafora" loading="lazy">
+          </div>
+          <div class="portfolio-body">
+            <h3 class="project-num-title">02. Leafora</h3>
+            <p class="project-tagline">Plant Shopping & Care App</p>
+            <p class="project-cat">UI/UX Design · Case Study · Figma</p>
+            <p class="project-detail">18 mobile screens covering shopping and plant-care experiences.</p>
+            <a href="https://www.behance.net/kishorekuppusa3?utm_source=chatgpt.com" target="_blank" rel="noopener noreferrer" class="project-link">
+              View on Behance &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Work 03 -->
+        <div class="glass-card portfolio-card">
+          <div class="card-image-wrap">
+            <img src="images/work-nescafe.jpg" alt="03. NESCAFÉ Classic" loading="lazy">
+          </div>
+          <div class="portfolio-body">
+            <h3 class="project-num-title">03. NESCAFÉ Classic</h3>
+            <p class="project-tagline">Make Your World</p>
+            <p class="project-cat">Advertising · Graphic Design · Photoshop</p>
+          </div>
+        </div>
+
+        <!-- Work 04 -->
+        <div class="glass-card portfolio-card">
+          <div class="card-image-wrap">
+            <img src="images/work-dc-flash.jpg" alt="04. DC – Illustrated Poster" loading="lazy">
+          </div>
+          <div class="portfolio-body">
+            <h3 class="project-num-title">04. DC – Illustrated Poster</h3>
+            <p class="project-tagline">Action Movie Poster Design</p>
+            <p class="project-cat">Poster Design · Illustration · Photoshop</p>
+          </div>
+        </div>
+
+        <!-- Work 05 -->
+        <div class="glass-card portfolio-card">
+          <div class="card-image-wrap">
+            <img src="images/work-airjordan.jpg" alt="05. Nike Air Jordan 1" loading="lazy">
+          </div>
+          <div class="portfolio-body">
+            <h3 class="project-num-title">05. Nike Air Jordan 1</h3>
+            <p class="project-tagline">Court Purple</p>
+            <p class="project-cat">Product Poster · Advertising · Photoshop</p>
+          </div>
+        </div>
+
+        <!-- Work 06 -->
+        <div class="glass-card portfolio-card">
+          <div class="card-image-wrap">
+            <img src="images/work-into-the-silence.jpg" alt="06. Into the Silence" loading="lazy">
+          </div>
+          <div class="portfolio-body">
+            <h3 class="project-num-title">06. Into the Silence</h3>
+            <p class="project-tagline">Double Exposure Surreal Portrait</p>
+            <p class="project-cat">Photo Manipulation · Creative Editing</p>
+          </div>
+        </div>
+
+        <!-- Work 07 -->
+        <div class="glass-card portfolio-card">
+          <div class="card-image-wrap">
+            <img src="images/work-gamepad.jpg" alt="07. Gamepad GP300" loading="lazy">
+          </div>
+          <div class="portfolio-body">
+            <h3 class="project-num-title">07. Gamepad GP300</h3>
+            <p class="project-tagline">Gaming Controller Product Poster</p>
+            <p class="project-cat">Product Design · Graphic Design · Photoshop</p>
+          </div>
+        </div>
+
+        <!-- Work 08 -->
+        <div class="glass-card portfolio-card">
+          <div class="card-image-wrap">
+            <img src="images/work-spiderman.jpg" alt="08. Spider-Man" loading="lazy">
+          </div>
+          <div class="portfolio-body">
+            <h3 class="project-num-title">08. Spider-Man</h3>
+            <p class="project-tagline">Creative Digital Artwork</p>
+            <p class="project-cat">Digital Art · Photo Manipulation</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. TOOLS & SKILLS -->
+    <section id="toolkit">
+      <span class="section-label">MY TOOLKIT / 05</span>
+      <h2 class="section-title">Tools & skills</h2>
+      <div class="toolkit-grid">
+
+        <div class="glass-card">
+          <h3 class="toolkit-column-title">Design tools</h3>
+          <ul class="pill-list">
+            <li class="pill-item">Figma</li>
+            <li class="pill-item">Adobe Photoshop</li>
+            <li class="pill-item">Adobe Illustrator</li>
+          </ul>
+        </div>
+
+        <div class="glass-card">
+          <h3 class="toolkit-column-title">Creative tools</h3>
+          <ul class="pill-list">
+            <li class="pill-item">Adobe Premiere Pro</li>
+            <li class="pill-item">AI Creative Tools</li>
+          </ul>
+        </div>
+
+        <div class="glass-card">
+          <h3 class="toolkit-column-title">Core skills</h3>
+          <ul class="pill-list">
+            <li class="pill-item">User Interface Design</li>
+            <li class="pill-item">User Experience Design</li>
+            <li class="pill-item">Wireframing & Prototyping</li>
+            <li class="pill-item">Design Systems</li>
+            <li class="pill-item">Responsive Design</li>
+            <li class="pill-item">Typography & Color Theory</li>
+            <li class="pill-item">Photo Manipulation</li>
+            <li class="pill-item">Visual Storytelling</li>
+            <li class="pill-item">Video Editing</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 6. MY DESIGN PROCESS -->
+    <section id="workflow">
+      <span class="section-label">WORKFLOW / 06</span>
+      <h2 class="section-title">My design process</h2>
+      <div class="process-timeline">
+
+        <div class="glass-card process-card">
+          <div class="process-step">01 — Discover</div>
+          <p class="process-desc">Understanding the idea, goals, audience, and design challenges.</p>
+        </div>
+
+        <div class="glass-card process-card">
+          <div class="process-step">02 — Research</div>
+          <p class="process-desc">Exploring references, user needs, and creative directions.</p>
+        </div>
+
+        <div class="glass-card process-card">
+          <div class="process-step">03 — Design</div>
+          <p class="process-desc">Creating layouts, wireframes, visual concepts, and interfaces.</p>
+        </div>
+
+        <div class="glass-card process-card">
+          <div class="process-step">04 — Refine</div>
+          <p class="process-desc">Improving details, consistency, usability, and visual quality.</p>
+        </div>
+
+        <div class="glass-card process-card">
+          <div class="process-step">05 — Deliver</div>
+          <p class="process-desc">Presenting polished designs and final creative outputs.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 7. EDUCATION -->
+    <section id="education">
+      <span class="section-label">EDUCATION / 07</span>
+      <h2 class="section-title">Education</h2>
+      <div class="glass-card education-card">
+        <h3 class="edu-degree">Bachelor of Science – Visual Communication</h3>
+        <p class="edu-institution">Jairams Arts & Science College, Karur · Bharathidasan University</p>
+        <p class="edu-meta">2023 – 2025 · CGPA: 6.28</p>
+        <p class="edu-desc">My academic background helped me develop a strong foundation in visual communication, creativity, design principles, and digital media.</p>
+      </div>
+    </section>
+
+    <!-- 8. CONTACT SECTION -->
+    <section id="contact">
+      <span class="section-label">LET'S CONNECT / 08</span>
+      <div class="glass-card contact-card">
+        <h2 class="contact-heading">Have a creative idea?</h2>
+        <p class="contact-tagline">Let's turn your ideas into something meaningful.</p>
+        <p class="contact-subtext">I'm open to opportunities, collaborations, freelance projects, and creative conversations.</p>
+
+        <ul class="contact-list">
+          <li class="contact-item">
+            <span class="contact-item-label">Email</span>
+            <span class="contact-item-value">
+              <a href="mailto:kishore.kuppusamyoffi@gmail.com">kishore.kuppusamyoffi@gmail.com</a>
+            </span>
+          </li>
+          <li class="contact-item">
+            <span class="contact-item-label">Phone</span>
+            <span class="contact-item-value">
+              <a href="tel:+919123502067">+91 91235 02067</a>
+            </span>
+          </li>
+          <li class="contact-item">
+            <span class="contact-item-label">Location</span>
+            <span class="contact-item-value">Karur, Tamil Nadu, India</span>
+          </li>
+          <li class="contact-item">
+            <span class="contact-item-label">Behance</span>
+            <span class="contact-item-value">
+              <a href="https://www.behance.net/kishorekuppusa3" target="_blank" rel="noopener noreferrer">behance.net/kishorekuppusa3</a>
+            </span>
+          </li>
+          <li class="contact-item">
+            <span class="contact-item-label">LinkedIn</span>
+            <span class="contact-item-value">
+              <a href="https://www.linkedin.com/in/kishore-kuppusamy-347596379/" target="_blank" rel="noopener noreferrer">linkedin.com/in/kishore-kuppusamy-347596379</a>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 9. FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <p class="footer-text">Designed & Crafted by Kishore Kuppusamy.</p>
+      <p class="footer-text">&copy; 2026 Kishore Kuppusamy. All Rights Reserved.</p>
+      <p class="footer-text footer-highlight">Made with creativity and passion.</p>
+    </div>
+  </footer>
+
+  <!-- SMOOTH CANVAS ANIMATION SCRIPT -->
+  <script>
+    (function () {
+      const canvas = document.getElementById('animation-canvas');
+      const ctx = canvas.getContext('2d');
+      const frameCount = 238;
+
+      const currentFramePath = (index) =>
+        `frames/ezgif-frame-${String(index).padStart(3, '0')}.jpg`;
+
+      const images = new Array(frameCount);
+      const loaded = new Array(frameCount).fill(false);
+
+      let targetProgress = 0;
+      let currentProgress = 0;
+      let lastDrawnIndex = -1;
+      const lerpSpeed = 0.08;
+
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        renderFrame(lastDrawnIndex >= 0 ? lastDrawnIndex : 0);
+      }
+
+      function renderFrame(index) {
+        let img = images[index];
+        if (!loaded[index]) {
+          for (let offset = 1; offset < frameCount; offset++) {
+            if (index - offset >= 0 && loaded[index - offset]) {
+              img = images[index - offset];
+              break;
+            }
+            if (index + offset < frameCount && loaded[index + offset]) {
+              img = images[index + offset];
+              break;
+            }
+          }
+        }
+
+        if (!img || !img.complete || img.naturalWidth === 0) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const canvasRatio = canvas.width / canvas.height;
+        const imgRatio = img.width / img.height;
+
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (canvasRatio > imgRatio) {
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / imgRatio;
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2;
+        } else {
+          drawHeight = canvas.height;
+          drawWidth = canvas.height * imgRatio;
+          offsetX = (canvas.width - drawWidth) / 2;
+          offsetY = 0;
+        }
+
+        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+        lastDrawnIndex = index;
+      }
+
+      function updateScrollProgress() {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = Math.max(0, window.pageYOffset || document.documentElement.scrollTop);
+        targetProgress = maxScroll > 0 ? Math.min(1, Math.max(0, scrolled / maxScroll)) : 0;
+      }
+
+      // Preload image sequence
+      for (let i = 0; i < frameCount; i++) {
+        const img = new Image();
+        img.src = currentFramePath(i + 1);
+        img.onload = () => {
+          loaded[i] = true;
+          if (i === 0 && lastDrawnIndex === -1) {
+            renderFrame(0);
+          }
+        };
+        images[i] = img;
+      }
+
+      // Animation render loop
+      function loop() {
+        const diff = targetProgress - currentProgress;
+        if (Math.abs(diff) > 0.0001) {
+          currentProgress += diff * lerpSpeed;
+        } else {
+          currentProgress = targetProgress;
+        }
+
+        const frameIndex = Math.min(
+          frameCount - 1,
+          Math.max(0, Math.round(currentProgress * (frameCount - 1)))
+        );
+
+        renderFrame(frameIndex);
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener('scroll', updateScrollProgress, { passive: true });
+      window.addEventListener('resize', resizeCanvas);
+
+      resizeCanvas();
+      updateScrollProgress();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
